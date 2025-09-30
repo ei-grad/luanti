@@ -116,34 +116,40 @@ local collect_items = function(filter, lang_code)
 	for itemstring, def in pairs(core.registered_items) do
 		if itemstring ~= "" and itemstring ~= "unknown" and itemstring ~= "ignore" then
 			if filter and lang_code then
-				local desc = ItemStack(itemstring):get_description()
-				local matches
+				local matches = false
+				
 				-- First, try to match original description
+				local desc = ItemStack(itemstring):get_description()
 				if desc ~= "" then
 					local ldesc = string.lower(desc)
 					matches = string.match(ldesc, filter) ~= nil
-					-- Second, try to match translated description
-					if not matches then
-						local tdesc = core.get_translated_string(lang_code, desc)
-						if tdesc ~= "" then
-							tdesc = string.lower(tdesc)
-							matches = string.match(tdesc, filter) ~= nil
-						end
-					end
-					-- Third, try to match translated short description
-					if not matches then
-						local sdesc = ItemStack(itemstring):get_short_description()
-						if sdesc ~= "" then
-							sdesc = core.get_translated_string(lang_code, sdesc)
-							sdesc = string.lower(sdesc)
-							matches = string.match(sdesc, filter) ~= nil
-						end
-					end
-
 				end
-				-- Fourth, try to match itemstring
+				
+				-- Second, try to match translated description
+				if not matches and desc ~= "" then
+					local tdesc = core.get_translated_string(lang_code, desc)
+					if tdesc ~= "" and tdesc ~= desc then  -- only check if translation is different
+						tdesc = string.lower(tdesc)
+						matches = string.match(tdesc, filter) ~= nil
+					end
+				end
+				
+				-- Third, try to match translated short description
 				if not matches then
-					matches = string.match(itemstring, filter) ~= nil
+					local sdesc = ItemStack(itemstring):get_short_description()
+					if sdesc ~= "" then
+						local tsdesc = core.get_translated_string(lang_code, sdesc)
+						if tsdesc ~= "" then
+							tsdesc = string.lower(tsdesc)
+							matches = string.match(tsdesc, filter) ~= nil
+						end
+					end
+				end
+				
+				-- Fourth, try to match itemstring (case-insensitive)
+				if not matches then
+					local lower_itemstring = string.lower(itemstring)
+					matches = string.match(lower_itemstring, filter) ~= nil
 				end
 
 				-- If item was matched, add to item list
