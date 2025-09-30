@@ -117,14 +117,14 @@ local collect_items = function(filter, lang_code)
 		if itemstring ~= "" and itemstring ~= "unknown" and itemstring ~= "ignore" then
 			if filter and lang_code then
 				local matches = false
-				
+
 				-- First, try to match original description
 				local desc = ItemStack(itemstring):get_description()
 				if desc ~= "" then
 					local ldesc = string.lower(desc)
 					matches = string.match(ldesc, filter) ~= nil
 				end
-				
+
 				-- Second, try to match translated description
 				if not matches and desc ~= "" then
 					local tdesc = core.get_translated_string(lang_code, desc)
@@ -133,7 +133,7 @@ local collect_items = function(filter, lang_code)
 						matches = string.match(tdesc, filter) ~= nil
 					end
 				end
-				
+
 				-- Third, try to match translated short description
 				if not matches then
 					local sdesc = ItemStack(itemstring):get_short_description()
@@ -145,7 +145,7 @@ local collect_items = function(filter, lang_code)
 						end
 					end
 				end
-				
+
 				-- Fourth, try to match itemstring (case-insensitive)
 				if not matches then
 					local lower_itemstring = string.lower(itemstring)
